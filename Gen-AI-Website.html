@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Augmented Classroom | Responsible AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #020617;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --primary: #38bdf8;
+            --accent: #bef264;
+            --text-main: #f1f5f9;
+            --text-dim: #94a3b8;
+            --transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text-main); 
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* PIXEL PARTICLE STYLE */
+        .pixel {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            pointer-events: none;
+            z-index: 2000;
+        }
+
+        /* BACKGROUND ANIMATION */
+        body::before, body::after {
+            content: "";
+            position: fixed;
+            width: 50vw;
+            height: 50vw;
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(100px);
+            opacity: 0.15;
+            animation: move 20s infinite alternate;
+        }
+        body::before { background: var(--primary); top: -10%; left: -10%; }
+        body::after { background: var(--accent); bottom: -10%; right: -10%; animation-delay: -10s; }
+
+        @keyframes move {
+            from { transform: translate(0, 0); }
+            to { transform: translate(20%, 20%); }
+        }
+
+        nav {
+            position: fixed; top: 0; width: 100%; display: flex; justify-content: space-between;
+            align-items: center; padding: 1.5rem 5%; 
+            background: rgba(2, 6, 23, 0.8);
+            backdrop-filter: blur(20px); z-index: 1000; 
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo { 
+            font-weight: 800; font-size: 1.4rem; 
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links button {
+            background: none; border: none; color: var(--text-dim); font-weight: 600; 
+            cursor: pointer; text-transform: uppercase; font-size: 0.75rem; margin-left: 1.5rem;
+            transition: 0.3s; position: relative;
+        }
+        .nav-links button.active { color: var(--primary); }
+        .nav-links button.active::after {
+            content: ""; position: absolute; bottom: -5px; left: 0; width: 100%; height: 2px; background: var(--primary);
+        }
+
+        .main-container { display: flex; width: 500vw; height: 100vh; transition: transform var(--transition); }
+        section { width: 100vw; height: 100vh; display: flex; flex-shrink: 0; }
+
+        .tab-content-container {
+            width: 100%; height: 100%; padding: 120px 8% 40px; overflow-y: auto;
+        }
+
+        .section-header { margin-bottom: 3rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 2rem; }
+        .section-header h2 { font-size: 3.5rem; color: white; margin-bottom: 0.5rem; letter-spacing: -2px; }
+
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            transition: 0.3s ease;
+        }
+        .glass-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+
+        .detail-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 4rem; align-items: start; }
+        .points-stack { display: flex; flex-direction: column; gap: 1.5rem; }
+        .bullet-point { padding: 1.5rem; display: flex; gap: 1.5rem; align-items: flex-start; }
+        
+        .icon-box {
+            width: 54px; height: 54px; border-radius: 12px; background: rgba(56, 189, 248, 0.1);
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--primary);
+        }
+
+        .point-text h4 { font-size: 1.25rem; color: var(--accent); margin-bottom: 0.4rem; }
+        .point-text p { font-size: 1.05rem; color: var(--text-dim); line-height: 1.5; }
+
+        .visual-stack { display: flex; flex-direction: column; gap: 1.5rem; }
+        .content-image { width: 100%; height: 280px; border-radius: 20px; object-fit: cover; filter: brightness(0.9); border: 1px solid var(--glass-border); }
+
+        /* EQUITY TAB */
+        .equity-professional-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+        .equity-box { padding: 2.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+        .equity-box h3 { color: var(--accent); font-size: 1.5rem; display: flex; align-items: center; gap: 10px; }
+        .regulation-subgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem; }
+        .reg-item { background: rgba(15, 23, 42, 0.4); padding: 1.2rem; border-radius: 12px; border: 1px solid var(--glass-border); }
+        .reg-item strong { color: var(--primary); display: block; margin-bottom: 5px; font-size: 0.8rem; text-transform: uppercase; }
+        .conclusion-bar {
+            grid-column: span 2; 
+            background: linear-gradient(90deg, rgba(56, 189, 248, 0.15), rgba(190, 242, 100, 0.15));
+            padding: 1.5rem 2.5rem; border-radius: 50px; text-align: center; border: 1px solid var(--primary);
+            font-weight: 700; color: white;
+        }
+
+        /* FLASHCARD SYSTEM */
+        .guide-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 2rem; 
+            perspective: 1000px;
+        }
+
+        .flashcard {
+            height: 220px;
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .flashcard:hover {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(12px);
+        }
+
+        .card-front {
+            background: var(--card-bg);
+            color: var(--primary);
+        }
+
+        .card-back {
+            background: rgba(56, 189, 248, 0.1);
+            transform: rotateY(180deg);
+            border-color: var(--primary);
+        }
+
+        .card-front h3 { font-size: 1.5rem; margin-top: 1rem; color: var(--text-main); }
+        .card-back p { font-size: 1rem; color: var(--text-main); line-height: 1.5; }
+        .card-back h4 { color: var(--accent); margin-bottom: 0.5rem; }
+
+        /* HOME PAGE */
+        .home-container { width: 100%; height: 100%; padding: 120px 8% 40px; display: flex; flex-direction: column; justify-content: center; }
+        .hero-section { max-width: 900px; margin-bottom: 4rem; }
+        h1 { font-size: 4.5rem; font-weight: 800; line-height: 1; margin-bottom: 1.5rem; letter-spacing: -3px; }
+        .hero-p { font-size: 1.4rem; color: var(--text-dim); margin-bottom: 2rem; line-height: 1.6; }
+        .pillars-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+        .pillar-card { padding: 2rem; border-radius: 20px; }
+        .pillar-card h3 { color: var(--primary); font-size: 1.3rem; margin-bottom: 1rem; text-transform: uppercase; }
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--primary), #0ea5e9); 
+            color: white; border: none; padding: 1.1rem 2.5rem; border-radius: 50px; font-weight: 700; cursor: pointer;
+            box-shadow: 0 10px 20px rgba(56, 189, 248, 0.3); transition: 0.3s;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">Augmented Classroom</div>
+        <div class="nav-links">
+            <button onclick="handleTabClick(event, 0)" class="active" id="btn-0">Home</button>
+            <button onclick="handleTabClick(event, 1)" id="btn-1">Cognitive Growth</button>
+            <button onclick="handleTabClick(event, 2)" id="btn-2">Equity & Bias</button>
+            <button onclick="handleTabClick(event, 3)" id="btn-3">Human Side</button>
+            <button onclick="handleTabClick(event, 4)" style="color:var(--accent)" id="btn-4">Integrity Guide</button>
+        </div>
+    </nav>
+
+    <div class="main-container" id="master-slider">
+        
+        <section>
+            <div class="home-container">
+                <div class="hero-section">
+                    <h1>Intelligence <span style="color: var(--primary)">Augmented</span></h1>
+                    <p class="hero-p">Generative AI is not a temporary trend. It's a major shift in how we process information. By moving away from banning tools, we empower students to lead technology rather than follow it.</p>
+                    <button class="btn-primary" onclick="handleTabClick(event, 1)">Explore Research</button>
+                </div>
+                <div class="pillars-grid">
+                    <div class="pillar-card glass-card"><h3>Cognitive Growth</h3><p>AI should support thinking, not replace it. Used correctly, it helps students analyze, evaluate, and improve ideas.</p></div>
+                    <div class="pillar-card glass-card"><h3>Equity & Bias</h3><p>AI can reflect bias and exacerbate the digital divide. Schools need rules and equal access.</p></div>
+                    <div class="pillar-card glass-card"><h3>Human Side</h3><p>AI can’t replace teachers. Human connection, support, and understanding are essential for learning.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="tab-content-container">
+                <div class="section-header">
+                    <h2>Cognitive <span style="color: var(--accent)">Growth</span> & Adaptation</h2>
+                    <p>Moving beyond rote thinking to develop analytical direction.</p>
+                </div>
+                <div class="detail-grid">
+                    <div class="points-stack">
+                        <div class="bullet-point glass-card">
+                            <div class="icon-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.54-2.44 2.5 2.5 0 0 1-2-2.5V4.5A2.5 2.5 0 0 1 5 2h4.5z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.54-2.44 2.5 2.5 0 0 0 2-2.5V4.5A2.5 2.5 0 0 0 19 2h-4.5z"/></svg></div>
+                            <div class="point-text"><h4>Avoiding Offloading</h4><p>A major concern is cognitive offloading, where students rely on AI too much and weaken critical thinking skills.</p></div>
+                        </div>
+                        <div class="bullet-point glass-card">
+                            <div class="icon-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M12 18h.01"/></svg></div>
+                            <div class="point-text"><h4>Adapting Teaching Methods</h4><p>Instead of banning AI, schools should adapt teaching methods, like they did with calculators, and focus on deeper understanding.</p></div>
+                        </div>
+                        <div class="bullet-point glass-card">
+                            <div class="icon-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><line x1="2" y1="12" x2="22" y2="12"/></svg></div>
+                            <div class="point-text"><h4>Improving Thinking Skills</h4><p>AI can improve thinking if students use it to analyze, evaluate, and improve their work rather than just get answers.</p></div>
+                        </div>
+                        <div class="bullet-point glass-card">
+                            <div class="icon-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg></div>
+                            <div class="point-text"><h4>Process-Based Assessment</h4><p>Schools should change assessment to focus on the learning process, including how students use AI.</p></div>
+                        </div>
+                        <div class="bullet-point glass-card">
+                            <div class="icon-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg></div>
+                            <div class="point-text"><h4>Addressing the Digital Divide</h4><p>Another key issue is fairness, since not all students have equal access to AI (digital divide).</p></div>
+                        </div>
+                        <div class="bullet-point glass-card">
+                            <div class="icon-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                            <div class="point-text"><h4>Literacy & Regulation</h4><p>Schools should promote AI literacy. Overall, regulation is necessary to make AI fair, responsible, and beneficial for all students.</p></div>
+                        </div>
+                    </div>
+                    <div class="visual-stack">
+                        <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800" class="content-image" alt="Classroom Technology">
+                        <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800" class="content-image" alt="Student Collaboration">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="tab-content-container">
+                <div class="section-header">
+                    <h2>Equity, Bias & <span style="color: var(--primary)">Regulation</span></h2>
+                    <p>Addressing the systemic challenges of the digital era.</p>
+                </div>
+                <div class="equity-professional-grid">
+                    <div class="equity-box glass-card">
+                        <h3>⚖️ The Digital Divide</h3>
+                        <p style="color: var(--text-dim);">A critical issue with AI is socioeconomic fairness. Without universal access, students without technology could fall further behind, exacerbating existing inequality.</p>
+                        <div style="padding: 1.2rem; background: rgba(0,0,0,0.2); border-radius: 12px;">
+                            <h4 style="font-size: 0.9rem; color: var(--accent); margin-bottom: 0.5rem; text-transform: uppercase;">Literacy Over Avoidance</h4>
+                            <p style="font-size: 0.95rem;">AI can reflect bias from its training data. Schools must teach AI Literacy—empowering students to question, check, and analyze outputs.</p>
+                        </div>
+                    </div>
+                    <div class="equity-box glass-card">
+                        <h3>🛡️ Regulation Framework</h3>
+                        <p style="color: var(--text-dim);">To ensure AI remains a beneficial utility, responsibility must be shared across three pillars:</p>
+                        <div class="regulation-subgrid">
+                            <div class="reg-item"><strong>Schools</strong><p>Defining ethical rules for classroom use.</p></div>
+                            <div class="reg-item"><strong>Govt</strong><p>Protecting user data and fairness.</p></div>
+                            <div class="reg-item"><strong>Tech</strong><p>Improving transparency and reducing bias.</p></div>
+                        </div>
+                    </div>
+                    <div class="conclusion-bar">"With equal access and proper rules, AI can promote fairness instead of inequality."</div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="tab-content-container">
+                <div class="section-header">
+                    <h2>The <span style="color: #f472b6;">Human</span> Element</h2>
+                    <p>Why education remains a deeply human endeavor.</p>
+                </div>
+                <div class="detail-grid">
+                    <div class="points-stack">
+                        <div class="bullet-point glass-card">
+                            <div class="icon-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+                            <div class="point-text"><h4>Irreplaceable Qualities</h4><p>AI cannot replace the human side of education, which includes relationships, emotions, and personal growth.</p></div>
+                        </div>
+                        <div class="bullet-point glass-card">
+                            <div class="icon-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div>
+                            <div class="point-text"><h4>Empathy & Adaptability</h4><p>Teachers provide empathy, support, and adaptability that AI cannot match.</p></div>
+                        </div>
+                        <div class="bullet-point glass-card">
+                            <div class="icon-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                            <div class="point-text"><h4>Trust & Success</h4><p>Human interaction is essential for building trust and helping students succeed.</p></div>
+                        </div>
+                        <div class="bullet-point glass-card">
+                            <div class="icon-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.7-3.7a1 1 0 0 0 0-1.4l-1.6-1.6a1 1 0 0 0-1.4 0l-3.7 3.7z"/><path d="M12 22a7 7 0 0 0 7-7M5 15a7 7 0 0 1 7-7"/><path d="M2 12a10 10 0 0 1 20 0"/></svg></div>
+                            <div class="point-text"><h4>Support vs. Replacement</h4><p>Instead of replacing teachers, AI should support them by handling routine tasks like grading and organization.</p></div>
+                        </div>
+                        <div class="bullet-point glass-card">
+                            <div class="icon-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg></div>
+                            <div class="point-text"><h4>Personalized Focus</h4><p>This allows teachers to focus more on students, making learning more personal and effective.</p></div>
+                        </div>
+                    </div>
+                    <div class="visual-stack">
+                        <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1200" class="content-image" alt="Teacher and Student">
+                        <div class="glass-card" style="padding: 1.5rem; border-left: 4px solid var(--primary);">
+                            <p style="font-style: italic; color: var(--text-main);">"AI provides the scale, but humans provide the soul of education."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="tab-content-container">
+                <div class="section-header">
+                    <h2>AI Integrity <span style="color: var(--accent)">Guide</span></h2>
+                    <p>Flip the cards to learn how to use AI responsibly.</p>
+                </div>
+                <div class="guide-grid">
+                    <div class="flashcard">
+                        <div class="card-front">
+                            <img src="https://img.icons8.com/fluency/96/idea.png" width="60">
+                            <h3>01. Prompt Hints</h3>
+                        </div>
+                        <div class="card-back">
+                            <h4>Think First</h4>
+                            <p>Ask for a logic step or a brainstorm, not the final answer. Keep the thinking yours.</p>
+                        </div>
+                    </div>
+                    <div class="flashcard">
+                        <div class="card-front">
+                            <img src="https://img.icons8.com/fluency/96/verified-account.png" width="60">
+                            <h3>02. Cross-Verify</h3>
+                        </div>
+                        <div class="card-back">
+                            <h4>Double Check</h4>
+                            <p>AI is a 'drafter' prone to errors. Always verify data with two reliable sources.</p>
+                        </div>
+                    </div>
+                    <div class="flashcard">
+                        <div class="card-front">
+                            <img src="https://img.icons8.com/fluency/96/handshake.png" width="60">
+                            <h3>03. Disclose Use</h3>
+                        </div>
+                        <div class="card-back">
+                            <h4>Transparency</h4>
+                            <p>Be transparent. State where AI assisted your process to build trust with teachers.</p>
+                        </div>
+                    </div>
+                    <div class="flashcard">
+                        <div class="card-front">
+                            <img src="https://img.icons8.com/fluency/96/feather.png" width="60">
+                            <h3>04. Your Voice</h3>
+                        </div>
+                        <div class="card-back">
+                            <h4>Authenticity</h4>
+                            <p>AI content is a tool for ideas, but the final argument must sound like you.</p>
+                        </div>
+                    </div>
+                    <div class="flashcard">
+                        <div class="card-front">
+                            <img src="https://img.icons8.com/fluency/96/copyright.png" width="60">
+                            <h3>05. Copyright</h3>
+                        </div>
+                        <div class="card-back">
+                            <h4>Originality</h4>
+                            <p>Do not let AI copy material verbatim. Give proper attribution to all sources.</p>
+                        </div>
+                    </div>
+                    <div class="flashcard">
+                        <div class="card-front">
+                            <img src="https://img.icons8.com/fluency/96/edit-file.png" width="60">
+                            <h3>06. Final Review</h3>
+                        </div>
+                        <div class="card-back">
+                            <h4>Editor-in-Chief</h4>
+                            <p>You are the final authority. Ensure the product meets your standards and ethics.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // PIXEL EXPLOSION LOGIC
+        function createExplosion(x, y) {
+            const colors = ['#38bdf8', '#bef264', '#ffffff', '#0ea5e9'];
+            for (let i = 0; i < 12; i++) {
+                const pixel = document.createElement('div');
+                pixel.className = 'pixel';
+                pixel.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                pixel.style.left = x + 'px';
+                pixel.style.top = y + 'px';
+                document.body.appendChild(pixel);
+
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = 2 + Math.random() * 4;
+                const vx = Math.cos(angle) * velocity;
+                const vy = Math.sin(angle) * velocity;
+                
+                let opacity = 1;
+                let posX = x;
+                let posY = y;
+
+                const animate = () => {
+                    posX += vx;
+                    posY += vy;
+                    opacity -= 0.04;
+                    pixel.style.left = posX + 'px';
+                    pixel.style.top = posY + 'px';
+                    pixel.style.opacity = opacity;
+                    pixel.style.transform = `scale(${opacity})`;
+                    if (opacity > 0) requestAnimationFrame(animate);
+                    else pixel.remove();
+                };
+                requestAnimationFrame(animate);
+            }
+        }
+
+        function handleTabClick(event, index) {
+            createExplosion(event.clientX, event.clientY);
+            document.getElementById('master-slider').style.transform = `translateX(-${index * 100}vw)`;
+            const navButtons = document.querySelectorAll('.nav-links button');
+            navButtons.forEach((btn, i) => btn.classList.toggle('active', i === index));
+        }
+    </script>
+</body>
+</html>
